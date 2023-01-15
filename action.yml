@@ -1,5 +1,7 @@
 name: 'docs-builder'
 description: 'Docs builder from md to MDx'
+icon: "anchor"
+color: yellow
 author: 'Vladimir-Urik'
 inputs:
   repo:

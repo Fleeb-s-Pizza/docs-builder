@@ -93,6 +93,8 @@ async function run(): Promise<void> {
               `temp/${category}/${page.slug}.mdx`,
               generatePage(page)
             )
+
+            core.debug(`Generated MDX file for ${page.slug}`)
           })
         }
       })
@@ -103,7 +105,17 @@ async function run(): Promise<void> {
     // Move all files in temp to ./pages/docs
     fs.rmdirSync('pages/docs', { recursive: true })
     fs.mkdirSync('pages/docs')
+    fs.mkdirSync('public/docs')
     fs.readdirSync('temp').forEach((file) => {
+      if(file === 'categories.json') {
+        fs
+        .rename
+        (`temp/${file}`, `public/docs/${file}`, (err) => {
+          if (err) throw err
+        })
+        return
+      }
+
       fs.rename
       (`temp/${file}`, `pages/docs/${file}`, (err) => {
         if (err) throw err

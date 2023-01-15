@@ -27,6 +27,7 @@ async function run(): Promise<void> {
 
     core.debug(`Cloned ${repo} on branch ${branch}`)
     fs.unlinkSync('temp/README.md')
+    fs.rmdirSync('temp/.git', { recursive: true })
 
     const categories = fs.readdirSync('temp')
 

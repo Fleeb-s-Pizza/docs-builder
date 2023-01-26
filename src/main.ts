@@ -7,7 +7,7 @@ import { generateCategoriesJSON, generatePage } from './utils/generators'
 
 async function run(): Promise<void> {
   try {
-    fs.mkdirSync('temp')
+    fs.mkdirSync('./temp')
     core.debug(`Created temp folder`)
 
     // Clone the repo
@@ -26,15 +26,15 @@ async function run(): Promise<void> {
     ])
 
     core.debug(`Cloned ${repo} on branch ${branch}`)
-    fs.unlinkSync('temp/README.md')
-    fs.rmdirSync('temp/.git', { recursive: true })
+    fs.unlinkSync('./temp/README.md')
+    fs.rmdirSync('./temp/.git', { recursive: true })
 
     const categories = fs.readdirSync('temp')
 
     const pages: Category[] = []
     categories.forEach((category) => {
       const files = fs.readdirSync(`
-      temp/${category}`)
+      ./temp/${category}`)
       core.debug(`Found ${files.length} pages in ${category}`)
 
       pages.push({
@@ -42,7 +42,7 @@ async function run(): Promise<void> {
         pages: files.map((file) => {
           // read the file
           let content = fs.readFileSync
-          (`temp/${category}/${file}`, 'utf8')
+          (`./temp/${category}/${file}`, 'utf8')
 
           // get metadata after --- and before ---
           const regex = /---([\s\S]*?)---/g
@@ -79,12 +79,12 @@ async function run(): Promise<void> {
     core.debug(`Generating JSON file`)
     const json = generateCategoriesJSON(pages)
     core.debug(`Generated JSON file`)
-    fs.writeFileSync('temp/categories.json', JSON.stringify(json))
+    fs.writeFileSync('./temp/categories.json', JSON.stringify(json))
 
     // delete all categories folders
     categories.forEach((category) => {
-      fs.rmdirSync(`temp/${category}`, { recursive: true })
-      fs.mkdirSync(`temp/${category}`)
+      fs.rmdirSync(`./temp/${category}`, { recursive: true })
+      fs.mkdirSync(`./temp/${category}`)
 
       // create mdx files by slug
       pages.forEach((pageCategory) => {
@@ -104,27 +104,27 @@ async function run(): Promise<void> {
     core.debug(`Generated MDX files`)
 
     // Move all files in temp to ./pages/docs
-    fs.rmdirSync('pages/docs', { recursive: true })
-    fs.mkdirSync('pages/docs')
-    fs.mkdirSync('public/docs')
+    fs.rmdirSync('./pages/docs', { recursive: true })
+    fs.mkdirSync('./pages/docs')
+    fs.mkdirSync('./public/docs')
     fs.readdirSync('temp').forEach((file) => {
       if(file === 'categories.json') {
         fs
         .rename
-        (`temp/${file}`, `public/docs/${file}`, (err) => {
+        (`./temp/${file}`, `./public/docs/${file}`, (err) => {
           if (err) throw err
         })
         return
       }
 
       fs.rename
-      (`temp/${file}`, `pages/docs/${file}`, (err) => {
+      (`./temp/${file}`, `./pages/docs/${file}`, (err) => {
         if (err) throw err
       })
     })
 
     core.debug(`Moved files to pages/docs`)
-    fs.rmdirSync('temp', { recursive: true })
+    fs.rmdirSync('./temp', { recursive: true })
     core.setOutput('time', new Date().toTimeString())
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)

@@ -46,7 +46,7 @@ const generators_1 = __nccwpck_require__(261);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            fs.mkdirSync('temp');
+            fs.mkdirSync('./temp');
             core.debug(`Created temp folder`);
             // Clone the repo
             const repo = core.getInput('repo');
@@ -62,19 +62,19 @@ function run() {
                 "temp",
             ]);
             core.debug(`Cloned ${repo} on branch ${branch}`);
-            fs.unlinkSync('temp/README.md');
-            fs.rmdirSync('temp/.git', { recursive: true });
+            fs.unlinkSync('./temp/README.md');
+            fs.rmdirSync('./temp/.git', { recursive: true });
             const categories = fs.readdirSync('temp');
             const pages = [];
             categories.forEach((category) => {
                 const files = fs.readdirSync(`
-      temp/${category}`);
+      ./temp/${category}`);
                 core.debug(`Found ${files.length} pages in ${category}`);
                 pages.push({
                     name: category,
                     pages: files.map((file) => {
                         // read the file
-                        let content = fs.readFileSync(`temp/${category}/${file}`, 'utf8');
+                        let content = fs.readFileSync(`./temp/${category}/${file}`, 'utf8');
                         // get metadata after --- and before ---
                         const regex = /---([\s\S]*?)---/g;
                         const metadata = regex.exec(content);
@@ -104,11 +104,11 @@ function run() {
             core.debug(`Generating JSON file`);
             const json = (0, generators_1.generateCategoriesJSON)(pages);
             core.debug(`Generated JSON file`);
-            fs.writeFileSync('temp/categories.json', JSON.stringify(json));
+            fs.writeFileSync('./temp/categories.json', JSON.stringify(json));
             // delete all categories folders
             categories.forEach((category) => {
-                fs.rmdirSync(`temp/${category}`, { recursive: true });
-                fs.mkdirSync(`temp/${category}`);
+                fs.rmdirSync(`./temp/${category}`, { recursive: true });
+                fs.mkdirSync(`./temp/${category}`);
                 // create mdx files by slug
                 pages.forEach((pageCategory) => {
                     if (pageCategory.name === category) {
@@ -121,25 +121,25 @@ function run() {
             });
             core.debug(`Generated MDX files`);
             // Move all files in temp to ./pages/docs
-            fs.rmdirSync('pages/docs', { recursive: true });
-            fs.mkdirSync('pages/docs');
-            fs.mkdirSync('public/docs');
+            fs.rmdirSync('./pages/docs', { recursive: true });
+            fs.mkdirSync('./pages/docs');
+            fs.mkdirSync('./public/docs');
             fs.readdirSync('temp').forEach((file) => {
                 if (file === 'categories.json') {
                     fs
-                        .rename(`temp/${file}`, `public/docs/${file}`, (err) => {
+                        .rename(`./temp/${file}`, `./public/docs/${file}`, (err) => {
                         if (err)
                             throw err;
                     });
                     return;
                 }
-                fs.rename(`temp/${file}`, `pages/docs/${file}`, (err) => {
+                fs.rename(`./temp/${file}`, `./pages/docs/${file}`, (err) => {
                     if (err)
                         throw err;
                 });
             });
             core.debug(`Moved files to pages/docs`);
-            fs.rmdirSync('temp', { recursive: true });
+            fs.rmdirSync('./temp', { recursive: true });
             core.setOutput('time', new Date().toTimeString());
         }
         catch (error) {
